@@ -1,5 +1,3 @@
-import java.lang.IllegalStateException
-
 fun main(args: Array<String>) {
     val filePath = args[0]
     val reader = FileReader()
@@ -22,7 +20,7 @@ data class EntrySource(val subList: List<String>) {
         }
     }
 
-    val map: Map<String,String> = mapOf(
+    private val digitsMapping: Map<String, String> = mapOf(
         "     |  |" to "1",
         " _  _||_ " to "2",
         " _  _| _|" to "3",
@@ -34,7 +32,7 @@ data class EntrySource(val subList: List<String>) {
         " _ |_| _|" to "9",
         " _ | ||_|" to "0"
     )
-    
+
     private fun getDigits(): List<String> {
         val list: List<List<String>> = subList.map {
             it.chunked(3)
@@ -50,14 +48,14 @@ data class EntrySource(val subList: List<String>) {
         return digits
     }
 
-     fun getLong(): Long =
-         getDigits().joinToString(separator = "", prefix = "") {
-             map[it] ?: throw IllegalStateException("unknown mapping for: '$it'")
-         }.toLong()
-    
+    fun getLong(): Long =
+        getDigits().joinToString(separator = "", prefix = "") {
+            digitsMapping[it] ?: throw MalformedEntryException(it)
+        }.toLong()
 
 }
 
+class MalformedEntryException(it: String) : Exception("unknown mapping for: '$it'")
 
 class EntryParser {
 
