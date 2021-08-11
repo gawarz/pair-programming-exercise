@@ -1,3 +1,5 @@
+import java.lang.IllegalStateException
+
 fun main(args: Array<String>) {
     val filePath = args[0]
     val reader = FileReader()
@@ -6,11 +8,10 @@ fun main(args: Array<String>) {
     val entrySource = EntryParser().parseLine(lines)
 
     entrySource.forEach { source ->
-        val digits = source.getDigits()
-        println(digits)
+        val accountNumber = source.getLong()
+        println(accountNumber)
     }
 }
-
 
 data class EntrySource(val subList: List<String>) {
 
@@ -21,8 +22,20 @@ data class EntrySource(val subList: List<String>) {
         }
     }
 
-    fun getDigits(): List<Digit> {
-        val charList = mutableListOf<Digit>()
+    val map: Map<String,String> = mapOf(
+        "     |  |" to "1",
+        " _  _||_ " to "2",
+        " _  _| _|" to "3",
+        "   |_|  |" to "4",
+        " _ |_  _|" to "5",
+        " _ |_ |_|" to "6",
+        " _   |  |" to "7",
+        " _ |_||_|" to "8",
+        " _ |_| _|" to "9",
+        " _ | ||_|" to "0"
+    )
+    
+    private fun getDigits(): List<String> {
         val list: List<List<String>> = subList.map {
             it.chunked(3)
         }
@@ -34,17 +47,17 @@ data class EntrySource(val subList: List<String>) {
         val digits = list1.zip(list2) { a, b ->
             a + b
         }.zip(list3) { a, b -> a + b }
-
         return digits
-            .map { it.toCharArray().toList() }
-            .map { Digit(it) }
     }
+
+     fun getLong(): Long =
+         getDigits().joinToString(separator = "", prefix = "") {
+             map[it] ?: throw IllegalStateException("unknown mapping for: '$it'")
+         }.toLong()
+    
 
 }
 
-data class Digit(
-    val charList: List<Char>
-)
 
 class EntryParser {
 
