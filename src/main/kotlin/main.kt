@@ -1,3 +1,6 @@
 fun main(args: Array<String>) {
-    println("Hello World!")
+    val filePath = args[0]
+    val reader = FileReader()
+    val lines = reader.readLines(filePath)
+    println(lines.toString())
 }
